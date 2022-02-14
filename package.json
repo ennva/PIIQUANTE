@@ -4,7 +4,12 @@
   "description": "Piiquante se dédie à la création de sauces épicées dont les recettes sont gardées",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ennva/PIIQUANTE.git"
   },
   "keywords": [
     "Rest",
@@ -13,6 +18,12 @@
   "author": "nephty",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.2"
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.2.1",
+    "multer": "^1.4.4"
   }
 }
