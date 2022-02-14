@@ -210,10 +210,10 @@ exports.deteteSauce = async (req, res) => {
 
     Sauce.findByIdAndDelete(req.params.id).then(
         (sauce) => {
-            if(!sauce){
-                return res.status(404).send({error: "Sauce not found!"})
+            if (!sauce) {
+                return res.status(404).send({ error: "Sauce not found!" })
             }
-            res.status(200).send({message: "Sauce Deleted!"})
+            res.status(200).send({ message: "Sauce Deleted!" })
         }
     );
 }
@@ -232,39 +232,55 @@ exports.setLikeDislike = async (req, res) => {
     const sauceObj = await Sauce.findById(req.params.id);
     console.log(likeObj);
     console.log(sauceObj);
-    if(sauceObj){
-        if(likeObj.like == 1){
-            sauceObj.likes += 1;
-            sauceObj.userLiked.push(likeObj.userId); //j'ajoute userId dans l'array userLiked
-            if(sauceObj.userDisliked.includes(likeObj.userId)){
-                sauceObj.userDisliked.splice(likeObj.userId,1); //je retire userId dans l'array userDisLiked
+    if (sauceObj) {
+        if (likeObj.like == 1) {
+            if (sauceObj.likes >= 0) {
+                sauceObj.likes = sauceObj.userLiked.length + 1;
+                sauceObj.userLiked.push(likeObj.userId); //j'ajoute userId dans l'array userLiked
+                for (let index = 0; index < sauceObj.userDisliked.length; index++) {
+                    console.log("LIKE" + sauceObj.userDisliked[index]);
+                    if(sauceObj.userDisliked[index] == likeObj.userId){
+                        sauceObj.userDisliked.splice(likeObj.userId, 1); //je retire userId dans l'array userDisLiked
+                        --sauceObj.dislikes;
+                    }
+                }
             }
         }
-        if(likeObj.like == -1){
-            if(sauceObj.likes > 0){
-                sauceObj.likes -= 1;
+        if (likeObj.like == -1) {
+            if (sauceObj.dislikes >= 0) {
+                sauceObj.dislikes = sauceObj.userDisliked.length + 1;
                 sauceObj.userDisliked.push(likeObj.userId); //j'ajoute userId dans l'array userDisLiked
-                if(sauceObj.userLiked.includes(likeObj.userId)){
-                    sauceObj.userLiked.splice(likeObj.userId,1); //je retire userId dans l'array userLiked
+                for (let index = 0; index < sauceObj.userLiked.length; index++) {
+                    console.log("DISLIKE" + sauceObj.userLiked[index]);
+                    if(sauceObj.userLiked[index] == likeObj.userId){
+                        sauceObj.userLiked.splice(likeObj.userId, 1); //je retire userId dans l'array userLiked
+                        --sauceObj.likes;
+                    }
+                }
+            }
+        }
+        if (likeObj.like == 0) {
+            if (sauceObj.userLiked.includes(likeObj.userId)) {
+                sauceObj.userLiked.splice(likeObj.userId, 1); //je retire userId dans l'array userLiked
+                if(sauceObj.likes > 0){
+                    sauceObj.likes -= 1;
+                }
+            }
+
+            if (sauceObj.userDisliked.includes(likeObj.userId)) {
+                sauceObj.userDisliked.splice(likeObj.userId, 1); //je retire userId dans l'array userDisLiked
+                if(sauceObj.dislikes > 0){
+                    sauceObj.dislikes -= 1;
                 }
             }
         }
 
-        if(likeObj.like == 0){
-            if(sauceObj.likes > 0){
-                sauceObj.likes -= 1;
-                if(sauceObj.userLiked.includes(likeObj.userId)){
-                    sauceObj.userLiked.splice(likeObj.userId,1); //je retire userId dans l'array userLiked
-                }
-            }
-        }
-        
         Sauce.findByIdAndUpdate(req.params.id, sauceObj).then(
             (sauce) => {
-                if(!sauce){
-                    return res.status(404).send({error: "Sauce not found!"})
+                if (!sauce) {
+                    return res.status(404).send({ error: "Sauce not found!" })
                 }
-                res.status(200).send({message: "Like Succefull Registered!"})
+                res.status(200).send({ message: "Like Succefull Registered!" })
             }
         );
     }
